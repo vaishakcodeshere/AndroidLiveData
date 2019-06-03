@@ -17,14 +17,14 @@ import java.util.List;
 public class EventViewModel extends AndroidViewModel {
 
     private EntryDBHelper entryDBHelper;
-    private MutableLiveData<ArrayList<UserData>> mFavs;
+    private MutableLiveData<List<UserData>> mFavs;
 
     public EventViewModel(Application application) {
         super(application);
         entryDBHelper = new EntryDBHelper(application);
     }
 
-    public MutableLiveData<ArrayList<UserData>> getFavs() {
+    public MutableLiveData<List<UserData>> getFavs() {
         if (mFavs == null) {
             mFavs = new MutableLiveData<>();
             loadFavs();
@@ -34,7 +34,7 @@ public class EventViewModel extends AndroidViewModel {
     }
 
     private void loadFavs() {
-        ArrayList<UserData> newFavs = new ArrayList<>();
+        List<UserData> newFavs = new ArrayList<>();
         SQLiteDatabase db = entryDBHelper.getReadableDatabase();
         Cursor cursor = db.query(DbSettings.DBEntry.TABLE,
                 new String[]{

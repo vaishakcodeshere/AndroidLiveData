@@ -1,12 +1,13 @@
 package com.architecture.androidlivedata.activity;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,16 +15,16 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.architecture.androidlivedata.R;
-import com.architecture.androidlivedata.adapter.EventAdapter;
 import com.architecture.androidlivedata.model.UserData;
 import com.architecture.androidlivedata.viewmodel.EventViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     FloatingActionButton fab;
     EventViewModel eventViewModel;
-    ArrayList<UserData> userData;
+    List<UserData> userData;
     EventAdapter eventAdapter;
 
     @Override
@@ -48,16 +49,16 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        final Observer<ArrayList<UserData>> dataObserver = new Observer<ArrayList<UserData>>() {
+        final Observer<List<UserData>> dataObserver = new Observer<List<UserData>>() {
             @Override
-            public void onChanged(@Nullable final ArrayList<UserData> updatedList) {
+            public void onChanged(@Nullable final List<UserData> updatedList) {
 
                 Log.d("onChanged_ViewModel", "onChanged: " + updatedList.size());
 
                 if (userData == null) {
 
                     userData = updatedList;
-                    eventAdapter = new EventAdapter(userData);
+                    eventAdapter = new EventAdapter();
                     recyclerView.setAdapter(eventAdapter);
 
                 } else {
@@ -89,8 +90,6 @@ public class MainActivity extends AppCompatActivity {
                     });
                     result.dispatchUpdatesTo(eventAdapter);
                     userData = updatedList;
-                    eventAdapter = new EventAdapter(userData);
-                    recyclerView.setAdapter(eventAdapter);
                 }
 
             }
@@ -143,5 +142,44 @@ public class MainActivity extends AppCompatActivity {
 
         eventViewModel.getFavs().observe(this, dataObserver);
 
+    }
+
+
+
+    public class EventAdapter extends RecyclerView.Adapter<EventAdapter.FavViewHolder> {
+
+
+        @Override
+        public EventAdapter.FavViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_row, parent, false);
+            return new EventAdapter.FavViewHolder(itemView);
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void onBindViewHolder(EventAdapter.FavViewHolder holder, int position) {
+            UserData favourites = userData.get(position);
+            holder.username.setText("Name: " + favourites.mName);
+            holder.profession.setText("Profession: " + favourites.mProfession);
+            holder.company.setText("Company: " + favourites.mCompany);
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return userData.size();
+        }
+
+        class FavViewHolder extends RecyclerView.ViewHolder {
+
+            TextView username, profession, company;
+
+            FavViewHolder(View itemView) {
+                super(itemView);
+                username = itemView.findViewById(R.id.username);
+                profession = itemView.findViewById(R.id.profession);
+                company = itemView.findViewById(R.id.company);
+            }
+        }
     }
 }
